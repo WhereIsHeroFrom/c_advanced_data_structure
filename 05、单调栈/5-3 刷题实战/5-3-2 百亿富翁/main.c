@@ -5,23 +5,28 @@
 #define inf 2000000000
 
 int h[maxn], ans[maxn];
-int stk[maxn];
-int stk_top;
+
+typedef struct {
+    int data[maxn];
+    int top;
+} MonotonicStack;
+
+MonotonicStack stk;
 
 int cmp(int a, int b) {
     return a > b;
 }
 
 void findFirstMeetOnLeft(int n) {
-    stk_top = 0;
+    stk.top = 0;
     h[0] = inf;
-    stk[stk_top++] = 0;
+    stk.data[stk.top++] = 0;
     for (int i = 1; i <= n; ++i) {
-        while (stk_top > 0 && !cmp(h[stk[stk_top - 1]], h[i])) {
-            stk_top--;
+        while (stk.top > 0 && !cmp(h[stk.data[stk.top - 1]], h[i])) {
+            stk.top--;
         }
-        ans[i] = stk[stk_top - 1];
-        stk[stk_top++] = i;
+        ans[i] = stk.data[stk.top - 1];
+        stk.data[stk.top++] = i;
     }
 }
 

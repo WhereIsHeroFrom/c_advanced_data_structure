@@ -2,88 +2,108 @@
 #include <stdlib.h>
 
 #define maxn 100010
-#define lson(idx) (2*idx+1)
-#define rson(idx) (2*idx+2)
-#define parent(idx) ((idx-1)/2)
 
-int data[maxn];
-int heap_size = 0;
+typedef struct {
+    int data[maxn];
+    int size;
+} Heap;
 
-int cmp_big(int a, int b) {
+int Heap_CmpGreater(int a, int b) {
     return a > b;
 }
 
-void swap(int* a, int* b) {
+int Heap_CmpLess(int a, int b) {
+    return a < b;
+}
+
+int Heap_Lson(int idx) {
+    return 2 * idx + 1;
+}
+
+int Heap_Rson(int idx) {
+    return 2 * idx + 2;
+}
+
+int Heap_Parent(int idx) {
+    return (idx - 1) / 2;
+}
+
+void Heap_Swap(int* a, int* b) {
     int tmp = *a;
     *a = *b;
     *b = tmp;
 }
 
-void shiftUp(int curr) {
+void Heap_ShiftUp(Heap* heap, int curr, int (*cmp)(int, int)) {
     if (curr == 0) return;
-    int par = parent(curr);
-    if (cmp_big(data[curr], data[par])) {
-        swap(&data[curr], &data[par]);
-        shiftUp(par);
+    int par = Heap_Parent(curr);
+    if (cmp(heap->data[curr], heap->data[par])) {
+        Heap_Swap(&heap->data[curr], &heap->data[par]);
+        Heap_ShiftUp(heap, par, cmp);
     }
 }
 
-void shiftDown(int curr) {
-    int lsonId = lson(curr);
-    int rsonId = rson(curr);
-    int optId = curr;
-    if (lsonId < heap_size && cmp_big(data[lsonId], data[optId])) {
-        optId = lsonId;
+void Heap_ShiftDown(Heap* heap, int curr, int (*cmp)(int, int)) {
+    int lson_id = Heap_Lson(curr);
+    int rson_id = Heap_Rson(curr);
+    int opt_id = curr;
+    if (lson_id < heap->size && cmp(heap->data[lson_id], heap->data[opt_id])) {
+        opt_id = lson_id;
     }
-    if (rsonId < heap_size && cmp_big(data[rsonId], data[optId])) {
-        optId = rsonId;
+    if (rson_id < heap->size && cmp(heap->data[rson_id], heap->data[opt_id])) {
+        opt_id = rson_id;
     }
-    if (optId != curr) {
-        swap(&data[curr], &data[optId]);
-        shiftDown(optId);
+    if (opt_id != curr) {
+        Heap_Swap(&heap->data[curr], &heap->data[opt_id]);
+        Heap_ShiftDown(heap, opt_id, cmp);
     }
 }
 
-void heap_push(int val) {
-    data[heap_size++] = val;
-    shiftUp(heap_size - 1);
+void Heap_Init(Heap* heap) {
+    heap->size = 0;
 }
 
-void heap_pop() {
-    swap(&data[0], &data[heap_size - 1]);
-    heap_size--;
-    shiftDown(0);
+void Heap_Push(Heap* heap, int val, int (*cmp)(int, int)) {
+    heap->data[heap->size++] = val;
+    Heap_ShiftUp(heap, heap->size - 1, cmp);
 }
 
-int heap_top() {
-    return data[0];
+void Heap_Pop(Heap* heap, int (*cmp)(int, int)) {
+    Heap_Swap(&heap->data[0], &heap->data[heap->size - 1]);
+    heap->size--;
+    Heap_ShiftDown(heap, 0, cmp);
 }
 
-int heap_empty() {
-    return heap_size == 0;
+int Heap_Top(Heap* heap) {
+    return heap->data[0];
 }
 
-void heap_clear() {
-    heap_size = 0;
+int Heap_Empty(Heap* heap) {
+    return heap->size == 0;
+}
+
+void Heap_Clear(Heap* heap) {
+    heap->size = 0;
 }
 
 int main() {
-    heap_clear();
+    Heap heap;
+    Heap_Init(&heap);
     int n, k;
     int sum = 0;
     scanf("%d %d", &n, &k);
-    heap_push(k);
+    Heap_Push(&heap, k, Heap_CmpGreater);
     while (n--) {
         int a;
         scanf("%d", &a);
         if (a == 4) {
-            printf("%d\n", heap_top() + sum);
-            heap_pop();
+            printf("%d\n", Heap_Top(&heap) + sum);
+            Heap_Pop(&heap, Heap_CmpGreater);
         } else {
             int x;
             scanf("%d", &x);
             if (a == 1) {
-                heap_push(x - sum);
+                Heap_Push(&heap, x - sum, Heap_CmpGreater);
             } else if (a == 2) {
                 sum += x;
             } else if (a == 3) {

@@ -3,8 +3,15 @@
 
 #define maxn 100001
 
-int deque[maxn];
-int deque_front, deque_back;
+int h[maxn], ans[maxn];
+
+typedef struct {
+    int data[maxn];
+    int front;
+    int rear;
+} MonotonicQueue;
+
+MonotonicQueue deque;
 
 int cmp_max(int a, int b) {
     return a <= b;
@@ -14,31 +21,34 @@ int cmp_min(int a, int b) {
     return a >= b;
 }
 
-void findIntervalMinMax(int n, int h[], int k, int ans[], int (*cmp)(int, int)) {
-    deque_front = 0;
-    deque_back = 0;
+void findIntervalMinMax(int n, int k, int (*cmp)(int, int)) {
+    deque.front = 0;
+    deque.rear = 0;
     for (int i = 0; i < n; ++i) {
-        while (deque_back > deque_front && cmp(h[deque[deque_back - 1]], h[i])) {
-            deque_back--;
+        while (deque.rear > deque.front && cmp(h[deque.data[deque.rear - 1]], h[i])) {
+            deque.rear--;
         }
-        deque[deque_back++] = i;
-        while (deque[deque_back - 1] - deque[deque_front] + 1 > k) {
-            deque_front++;
+        deque.data[deque.rear++] = i;
+        while (deque.data[deque.rear - 1] - deque.data[deque.front] + 1 > k) {
+            deque.front++;
         }
-        ans[i] = h[deque[deque_front]];
+        ans[i] = h[deque.data[deque.front]];
     }
 }
 
 int main() {
     int h[] = {8, 7, 6, 9, 11};
     int ans[10];
-    findIntervalMinMax(5, h, 3, ans, cmp_max);
-    for (int i = 0; i < 5; ++i) {
+    int k = 3, n = 5;
+
+    findIntervalMinMax(n, k, cmp_max);
+    for (int i = k - 1; i < n; ++i) {
         printf("%d ", ans[i]);
     }
     printf("\n");
-    findIntervalMinMax(5, h, 3, ans, cmp_min);
-    for (int i = 0; i < 5; ++i) {
+
+    findIntervalMinMax(n, k, cmp_min);
+    for (int i = k - 1; i < n; ++i) {
         printf("%d ", ans[i]);
     }
     printf("\n");

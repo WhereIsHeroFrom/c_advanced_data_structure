@@ -4,8 +4,14 @@
 #define maxn 100001
 
 int h[maxn], ans[maxn];
-int deque[maxn];
-int deque_front, deque_back;
+
+typedef struct {
+    int data[maxn];
+    int front;
+    int rear;
+} MonotonicQueue;
+
+MonotonicQueue deque;
 
 int cmp_max(int a, int b) {
     return a <= b;
@@ -16,17 +22,17 @@ int cmp_min(int a, int b) {
 }
 
 void findIntervalMinMax(int n, int k, int (*cmp)(int, int)) {
-    deque_front = 0;
-    deque_back = 0;
+    deque.front = 0;
+    deque.rear = 0;
     for (int i = 0; i < n; ++i) {
-        while (deque_back > deque_front && cmp(h[deque[deque_back - 1]], h[i])) {
-            deque_back--;
+        while (deque.rear > deque.front && cmp(h[deque.data[deque.rear - 1]], h[i])) {
+            deque.rear--;
         }
-        deque[deque_back++] = i;
-        while (deque[deque_back - 1] - deque[deque_front] + 1 > k) {
-            deque_front++;
+        deque.data[deque.rear++] = i;
+        while (deque.data[deque.rear - 1] - deque.data[deque.front] + 1 > k) {
+            deque.front++;
         }
-        ans[i] = h[deque[deque_front]];
+        ans[i] = h[deque.data[deque.front]];
     }
 }
 
