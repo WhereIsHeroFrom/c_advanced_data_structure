@@ -1,7 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
+/////////////////////////////离散化模板/////////////////////////////
+// https://www.luogu.com.cn/problem/B3694
+
+// 2333 20 1.7 -5 20 1 20 -5
+// 第一步：排序  -5 -5 1 1.7 20 20 20 2333
+// 第二步：去重  -5 1 1.7 20 2333
+//               0  1 2   3  4
 #define type double
 #define maxn 100010
 
@@ -53,26 +59,26 @@ int Discretizer_Get(Discretizer* d, type v) {
     }
     return r;
 }
+/////////////////////////////离散化模板/////////////////////////////
+Discretizer d;
 
+type a[100001];
 int main() {
     int t;
-    while (scanf("%d", &t) != EOF) {
-        while (t--) {
-            Discretizer d;
-            Discretizer_Init(&d);
-            int n;
-            scanf("%d", &n);
-            type a[100001];
-            for (int i = 0; i < n; ++i) {
-                scanf("%lf", &a[i]);
-                Discretizer_AddData(&d, a[i]);
-            }
-            Discretizer_Process(&d);
-            for (int i = 0; i < n; ++i) {
-                printf("%d ", Discretizer_Get(&d, a[i]) + 1);
-            }
-            printf("\n");
+    scanf("%d", &t);
+    while(t--) {
+        Discretizer_Init(&d);
+        int n;
+        scanf("%d", &n);
+        for (int i = 0; i < n; ++i) {
+            scanf("%lf", &a[i]);
+            Discretizer_AddData(&d, a[i]);
         }
+        Discretizer_Process(&d);
+        for (int i = 0; i < n; ++i) {
+            printf("%d ", Discretizer_Get(&d, a[i]) + 1);
+        }
+        printf("\n");
     }
     return 0;
 }

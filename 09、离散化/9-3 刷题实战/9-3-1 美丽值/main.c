@@ -1,7 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
+/////////////////////////////离散化模板/////////////////////////////
+// https://www.luogu.com.cn/problem/B3694
+
+// 2333 20 1.7 -5 20 1 20 -5
+// 第一步：排序  -5 -5 1 1.7 20 20 20 2333
+// 第二步：去重  -5 1 1.7 20 2333
+//               0  1 2   3  4
 #define type int
 #define maxn 1000010
 
@@ -9,15 +15,6 @@ typedef struct {
     type data[maxn];
     int size;
 } Discretizer;
-
-typedef struct {
-    type h;
-    int b;
-} HB;
-
-HB hb[maxn];
-type k[maxn];
-int maxv[maxn];
 
 int cmp_type(const void* a, const void* b) {
     type va = *(type*)a;
@@ -62,6 +59,17 @@ int Discretizer_Get(Discretizer* d, type v) {
     }
     return r;
 }
+/////////////////////////////离散化模板/////////////////////////////
+Discretizer d;
+
+typedef struct {
+    type h;
+    int b;
+} HB;
+
+HB hb[maxn];
+type k[maxn];
+int maxv[maxn];
 
 int cmp_hb(const void* a, const void* b) {
     HB* ha = (HB*)a;
