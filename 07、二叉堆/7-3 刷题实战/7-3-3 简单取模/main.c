@@ -1,77 +1,93 @@
+/*
+大顶堆维护递减序列
+sum 维护堆中所有元素的和
+对于模数 x 
+每次弹出所有 >= x 的堆中元素
+取模完毕以后再放回堆中
+并且同时维护 sum 的值
+当堆顶元素 < x 时结束迭代过程
+*/
 #include <stdio.h>
-#include <stdlib.h>
 
+/////////////////////////////二叉堆模板/////////////////////////////
 #define maxn 100010
+typedef int (* cmp_t)(int a, int b);
 
 typedef struct {
     int data[maxn];
     int size;
+    cmp_t cmp;
 } Heap;
 
+// 大顶堆
 int Heap_CmpGreater(int a, int b) {
     return a > b;
 }
 
+// 小顶堆
 int Heap_CmpLess(int a, int b) {
     return a < b;
 }
 
-int Heap_Lson(int idx) {
+int lson(int idx) {
     return 2 * idx + 1;
 }
 
-int Heap_Rson(int idx) {
+int rson(int idx) {
     return 2 * idx + 2;
 }
 
-int Heap_Parent(int idx) {
+int parent(int idx) {
     return (idx - 1) / 2;
 }
 
-void Heap_Swap(int* a, int* b) {
+void swap(int* a, int* b) {
     int tmp = *a;
     *a = *b;
     *b = tmp;
 }
 
-void Heap_ShiftUp(Heap* heap, int curr, int (*cmp)(int, int)) {
+void shiftUp(Heap* heap, int curr) {
     if (curr == 0) return;
-    int par = Heap_Parent(curr);
-    if (cmp(heap->data[curr], heap->data[par])) {
-        Heap_Swap(&heap->data[curr], &heap->data[par]);
-        Heap_ShiftUp(heap, par, cmp);
+    int par = parent(curr);
+    if (heap->cmp(heap->data[curr], heap->data[par])) {
+        swap(&heap->data[curr], &heap->data[par]);
+        shiftUp(heap, par);
     }
 }
 
-void Heap_ShiftDown(Heap* heap, int curr, int (*cmp)(int, int)) {
-    int lson_id = Heap_Lson(curr);
-    int rson_id = Heap_Rson(curr);
+void shiftDown(Heap* heap, int curr) {
+    int lson_id = lson(curr);
+    int rson_id = rson(curr);
     int opt_id = curr;
-    if (lson_id < heap->size && cmp(heap->data[lson_id], heap->data[opt_id])) {
+    if (lson_id < heap->size && \
+        heap->cmp(heap->data[lson_id], heap->data[opt_id])) {
         opt_id = lson_id;
     }
-    if (rson_id < heap->size && cmp(heap->data[rson_id], heap->data[opt_id])) {
+    if (rson_id < heap->size && \
+        heap->cmp(heap->data[rson_id], heap->data[opt_id])) {
         opt_id = rson_id;
     }
     if (opt_id != curr) {
-        Heap_Swap(&heap->data[curr], &heap->data[opt_id]);
-        Heap_ShiftDown(heap, opt_id, cmp);
+        swap(&heap->data[curr], &heap->data[opt_id]);
+        shiftDown(heap, opt_id);
     }
 }
 
-void Heap_Init(Heap* heap) {
+void Heap_Init(Heap* heap, cmp_t cmp) {
     heap->size = 0;
+    heap->cmp = cmp;
 }
 
-void Heap_Push(Heap* heap, int val, int (*cmp)(int, int)) {
+void Heap_Push(Heap* heap, int val) {
     heap->data[heap->size++] = val;
-    Heap_ShiftUp(heap, heap->size - 1, cmp);
+    shiftUp(heap, heap->size - 1);
 }
 
-void Heap_Pop(Heap* heap, int (*cmp)(int, int)) {
-    Heap_Swap(&heap->data[0], &heap->data[heap->size - 1]);
+void Heap_Pop(Heap* heap) {
+    swap(&heap->data[0], &heap->data[heap->size - 1]);
     heap->size--;
-    Heap_ShiftDown(heap, 0, cmp);
+    shiftDown(heap, 0);
 }
 
 int Heap_Top(Heap* heap) {
@@ -81,21 +97,18 @@ int Heap_Top(Heap* heap) {
 int Heap_Empty(Heap* heap) {
     return heap->size == 0;
 }
-
-void Heap_Clear(Heap* heap) {
-    heap->size = 0;
-}
+/////////////////////////////二叉堆模板/////////////////////////////
+Heap heap;
 
 int main() {
-    Heap heap;
-    Heap_Init(&heap);
+    Heap_Init(&heap, Heap_CmpGreater);
     int n, k;
     long long sum = 0;
     scanf("%d %d", &n, &k);
     for (int i = 0; i < n; ++i) {
         int x;
         scanf("%d", &x);
-        Heap_Push(&heap, x, Heap_CmpGreater);
+        Heap_Push(&heap, x);
         sum += x;
     }
     while (k--) {
@@ -106,9 +119,10 @@ int main() {
                 sum -= Heap_Top(&heap);
                 int y = Heap_Top(&heap) % x;
                 sum += y;
-                Heap_Pop(&heap, Heap_CmpGreater);
-                Heap_Push(&heap, y, Heap_CmpGreater);
-            } else break;
+                Heap_Pop(&heap);
+                Heap_Push(&heap, y);
+            } else 
+                break;
         }
         printf("%lld ", sum);
     }
