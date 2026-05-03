@@ -1,22 +1,22 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 /////////////////////////////¶þ²æ¶ÑÄ£°å/////////////////////////////
+#define type int
 #define maxn 100010
-typedef int (* cmp_t)(int a, int b);
+typedef int (* cmp_t)(type a, type b);
 
 typedef struct {
-    int data[maxn];
+    type data[maxn];
     int size;
     cmp_t cmp;
 } Heap;
 
-// ´ó¶¥¶Ñ
-int Heap_CmpGreater(int a, int b) {
+int Heap_CmpGreater(type a, type b) {
     return a > b;
 }
 
-// Ð¡¶¥¶Ñ
-int Heap_CmpLess(int a, int b) {
+int Heap_CmpLess(type a, type b) {
     return a < b;
 }
 
@@ -32,8 +32,8 @@ int parent(int idx) {
     return (idx - 1) / 2;
 }
 
-void swap(int* a, int* b) {
-    int tmp = *a;
+void swap(type* a, type* b) {
+    type tmp = *a;
     *a = *b;
     *b = tmp;
 }
@@ -51,12 +51,10 @@ void shiftDown(Heap* heap, int curr) {
     int lson_id = lson(curr);
     int rson_id = rson(curr);
     int opt_id = curr;
-    if (lson_id < heap->size && \
-        heap->cmp(heap->data[lson_id], heap->data[opt_id])) {
+    if (lson_id < heap->size && heap->cmp(heap->data[lson_id], heap->data[opt_id])) {
         opt_id = lson_id;
     }
-    if (rson_id < heap->size && \
-        heap->cmp(heap->data[rson_id], heap->data[opt_id])) {
+    if (rson_id < heap->size && heap->cmp(heap->data[rson_id], heap->data[opt_id])) {
         opt_id = rson_id;
     }
     if (opt_id != curr) {
@@ -70,7 +68,7 @@ void Heap_Init(Heap* heap, cmp_t cmp) {
     heap->cmp = cmp;
 }
 
-void Heap_Push(Heap* heap, int val) {
+void Heap_Push(Heap* heap, type val) {
     heap->data[heap->size++] = val;
     shiftUp(heap, heap->size - 1);
 }
@@ -81,7 +79,7 @@ void Heap_Pop(Heap* heap) {
     shiftDown(heap, 0);
 }
 
-int Heap_Top(Heap* heap) {
+type Heap_Top(Heap* heap) {
     return heap->data[0];
 }
 
