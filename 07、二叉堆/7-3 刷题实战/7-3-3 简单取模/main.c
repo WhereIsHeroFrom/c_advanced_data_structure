@@ -1,12 +1,22 @@
 /*
-大顶堆维护递减序列
+用大顶堆来维护一个递减序列
 sum 维护堆中所有元素的和
-对于模数 x 
-每次弹出所有 >= x 的堆中元素
-取模完毕以后再放回堆中
+对于模数 x
+每次弹出所有 >= x 的元素
+（
+为什么弹出 >= x 的元素
+因为这是一个顶堆
+弹出的元素一定比堆中所有元素都要大
+所以如果某个堆顶元素 < x
+那么所有堆中元素堆 x 取模的值都是元素本身
+也就是这个 sum 值
+所以不需要再弹出来
+）
+把弹出元素取模以后再放回堆中
 并且同时维护 sum 的值
-当堆顶元素 < x 时结束迭代过程
 */
+
+
 #include <stdio.h>
 
 /////////////////////////////二叉堆模板/////////////////////////////
@@ -105,24 +115,23 @@ int main() {
     int n, k;
     long long sum = 0;
     scanf("%d %d", &n, &k);
-    for (int i = 0; i < n; ++i) {
+    for(int i = 0; i < n; ++i) {
         int x;
         scanf("%d", &x);
         Heap_Push(&heap, x);
         sum += x;
     }
-    while (k--) {
+    while(k--) {
         int x;
         scanf("%d", &x);
-        while (!Heap_Empty(&heap)) {
-            if (Heap_Top(&heap) >= x) {
+        while( !Heap_Empty(&heap) ) {
+            if( Heap_Top(&heap) >= x ) {
                 sum -= Heap_Top(&heap);
                 int y = Heap_Top(&heap) % x;
                 sum += y;
                 Heap_Pop(&heap);
                 Heap_Push(&heap, y);
-            } else 
-                break;
+            }else break;
         }
         printf("%lld ", sum);
     }
