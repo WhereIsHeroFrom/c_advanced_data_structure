@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <math.h>
 
+#define type int
 #define maxn 200001
 #define log2n_max 20
 
-int org[maxn];
+type org[maxn];
 int st_min[log2n_max][maxn];
 int st_max[log2n_max][maxn];
 int n;

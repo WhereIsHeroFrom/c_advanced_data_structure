@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <math.h>
 
+#define type double
 #define maxn 100001
 #define log2n_max 20
 
-int org[maxn];
+type org[maxn];
 int st[log2n_max][maxn];
 int n;
 
@@ -37,34 +38,19 @@ int SparseTable_Query(int l, int r) {
     return cmp_max(idx1, idx2) ? idx1 : idx2;
 }
 
-int read() {
-    int x = 0, f = 1;
-    char ch = getchar();
-    while (ch < '0' || ch > '9') {
-        if (ch == '-') f = -1;
-        ch = getchar();
-    }
-    while (ch >= '0' && ch <= '9') {
-        x = x * 10 + ch - 48;
-        ch = getchar();
-    }
-    return x * f;
-}
-
 int main() {
     int m;
-    n = read();
-    m = read();
+    scanf("%d %d", &n, &m);
     for (int i = 0; i < n; ++i) {
-        org[i] = read();
+        scanf("%lf", &org[i]);
     }
     SparseTable_Init();
     while (m--) {
-        int l = read();
-        int r = read();
+        int l, r;
+        scanf("%d %d", &l, &r);
         l--;
         r--;
-        printf("%d\n", org[SparseTable_Query(l, r)]);
+        printf("%.0f\n", org[SparseTable_Query(l, r)]);
     }
     return 0;
 }

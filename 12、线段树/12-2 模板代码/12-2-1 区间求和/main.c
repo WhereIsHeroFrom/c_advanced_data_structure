@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define type long long
 #define maxn 100001
 
-long long tree[4 * maxn];
-long long lazy[4 * maxn];
-long long arr[maxn];
+type tree[4 * maxn];
+type lazy[4 * maxn];
+type arr[maxn];
 int n;
 
 void build(int node, int start, int end) {
@@ -34,7 +35,7 @@ void pushDown(int node, int start, int end) {
     }
 }
 
-void updateRange(int node, int start, int end, int l, int r, long long val) {
+void updateRange(int node, int start, int end, int l, int r, type val) {
     if (start > r || end < l) return;
     if (start >= l && end <= r) {
         tree[node] += val * (end - start + 1);
@@ -50,7 +51,7 @@ void updateRange(int node, int start, int end, int l, int r, long long val) {
     tree[node] = tree[leftChild] + tree[rightChild];
 }
 
-long long queryRange(int node, int start, int end, int l, int r) {
+type queryRange(int node, int start, int end, int l, int r) {
     if (start > r || end < l) return 0;
     if (start >= l && end <= r) {
         return tree[node];
@@ -59,8 +60,8 @@ long long queryRange(int node, int start, int end, int l, int r) {
     int mid = (start + end) / 2;
     int leftChild = node * 2 + 1;
     int rightChild = node * 2 + 2;
-    long long leftSum = queryRange(leftChild, start, mid, l, r);
-    long long rightSum = queryRange(rightChild, mid + 1, end, l, r);
+    type leftSum = queryRange(leftChild, start, mid, l, r);
+    type rightSum = queryRange(rightChild, mid + 1, end, l, r);
     return leftSum + rightSum;
 }
 
@@ -68,11 +69,11 @@ void SegmentTree_Init() {
     build(0, 0, n - 1);
 }
 
-void SegmentTree_Update(int l, int r, long long val) {
+void SegmentTree_Update(int l, int r, type val) {
     updateRange(0, 0, n - 1, l, r, val);
 }
 
-long long SegmentTree_Query(int l, int r) {
+type SegmentTree_Query(int l, int r) {
     return queryRange(0, 0, n - 1, l, r);
 }
 
@@ -85,7 +86,7 @@ int main() {
     SegmentTree_Init();
     while (m--) {
         int z, x, y;
-        long long k;
+        type k;
         scanf("%d", &z);
         if (z == 1) {
             scanf("%d %d %lld", &x, &y, &k);

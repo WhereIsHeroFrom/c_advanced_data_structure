@@ -2,67 +2,74 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define type double
 #define maxn 100010
 
-int data[maxn];
-int data_size;
+typedef struct {
+    type data[maxn];
+    int size;
+} Discretizer;
 
-void Discretizer_AddData(int v) {
-    data[data_size++] = v;
+int cmp_type(const void* a, const void* b) {
+    type va = *(type*)a;
+    type vb = *(type*)b;
+    if (va < vb) return -1;
+    if (va > vb) return 1;
+    return 0;
 }
 
-int cmp_int(const void* a, const void* b) {
-    return *(int*)a - *(int*)b;
+void Discretizer_Init(Discretizer* d) {
+    d->size = 0;
 }
 
-void Discretizer_Process() {
-    qsort(data, data_size, sizeof(int), cmp_int);
+void Discretizer_AddData(Discretizer* d, type v) {
+    d->data[d->size++] = v;
+}
+
+void Discretizer_Process(Discretizer* d) {
+    qsort(d->data, d->size, sizeof(type), cmp_type);
     int lastIdx = 0;
-    for (int i = 1; i < data_size; ++i) {
-        int x = data[i];
-        if (x != data[lastIdx]) {
-            data[++lastIdx] = x;
+    for (int i = 1; i < d->size; ++i) {
+        type x = d->data[i];
+        if (x != d->data[lastIdx]) {
+            d->data[++lastIdx] = x;
         }
     }
-    data_size = lastIdx + 1;
+    d->size = lastIdx + 1;
 }
 
-int Discretizer_Get(int v) {
-    int l = -1, r = data_size;
+int Discretizer_Get(Discretizer* d, type v) {
+    int l = -1, r = d->size;
     while (l + 1 < r) {
         int mid = (l + r) >> 1;
-        if (data[mid] >= v) {
+        if (d->data[mid] >= v) {
             r = mid;
         } else {
             l = mid;
         }
     }
-    if (r == data_size || data[r] != v) {
+    if (r == d->size || d->data[r] != v) {
         return -1;
     }
     return r;
 }
 
-int Discretizer_Size() {
-    return data_size;
-}
-
-double a[100001];
-
 int main() {
     int t;
     while (scanf("%d", &t) != EOF) {
         while (t--) {
-            data_size = 0;
+            Discretizer d;
+            Discretizer_Init(&d);
             int n;
             scanf("%d", &n);
+            type a[100001];
             for (int i = 0; i < n; ++i) {
                 scanf("%lf", &a[i]);
-                Discretizer_AddData((int)a[i]);
+                Discretizer_AddData(&d, a[i]);
             }
-            Discretizer_Process();
+            Discretizer_Process(&d);
             for (int i = 0; i < n; ++i) {
-                printf("%d ", Discretizer_Get((int)a[i]) + 1);
+                printf("%d ", Discretizer_Get(&d, a[i]) + 1);
             }
             printf("\n");
         }

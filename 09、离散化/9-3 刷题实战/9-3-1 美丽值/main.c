@@ -2,91 +2,102 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define type int
 #define maxn 1000010
 
-int d_data[maxn];
-int d_size;
+typedef struct {
+    type data[maxn];
+    int size;
+} Discretizer;
 
 typedef struct {
-    int h, b;
+    type h;
+    int b;
 } HB;
 
 HB hb[maxn];
-int k[maxn];
+type k[maxn];
 int maxv[maxn];
 
-void Discretizer_AddData(int v) {
-    d_data[d_size++] = v;
+int cmp_type(const void* a, const void* b) {
+    type va = *(type*)a;
+    type vb = *(type*)b;
+    if (va < vb) return -1;
+    if (va > vb) return 1;
+    return 0;
 }
 
-int cmp_int(const void* a, const void* b) {
-    return *(int*)a - *(int*)b;
+void Discretizer_Init(Discretizer* d) {
+    d->size = 0;
 }
 
-void Discretizer_Process() {
-    qsort(d_data, d_size, sizeof(int), cmp_int);
+void Discretizer_AddData(Discretizer* d, type v) {
+    d->data[d->size++] = v;
+}
+
+void Discretizer_Process(Discretizer* d) {
+    qsort(d->data, d->size, sizeof(type), cmp_type);
     int lastIdx = 0;
-    for (int i = 1; i < d_size; ++i) {
-        int x = d_data[i];
-        if (x != d_data[lastIdx]) {
-            d_data[++lastIdx] = x;
+    for (int i = 1; i < d->size; ++i) {
+        type x = d->data[i];
+        if (x != d->data[lastIdx]) {
+            d->data[++lastIdx] = x;
         }
     }
-    d_size = lastIdx + 1;
+    d->size = lastIdx + 1;
 }
 
-int Discretizer_Get(int v) {
-    int l = -1, r = d_size;
+int Discretizer_Get(Discretizer* d, type v) {
+    int l = -1, r = d->size;
     while (l + 1 < r) {
         int mid = (l + r) >> 1;
-        if (d_data[mid] >= v) {
+        if (d->data[mid] >= v) {
             r = mid;
         } else {
             l = mid;
         }
     }
-    if (r == d_size || d_data[r] != v) {
+    if (r == d->size || d->data[r] != v) {
         return -1;
     }
     return r;
 }
 
-int Discretizer_Size() {
-    return d_size;
-}
-
 int cmp_hb(const void* a, const void* b) {
     HB* ha = (HB*)a;
     HB* hb = (HB*)b;
-    return ha->h - hb->h;
+    if (ha->h < hb->h) return -1;
+    if (ha->h > hb->h) return 1;
+    return 0;
 }
 
 int main() {
-    d_size = 0;
+    Discretizer d;
+    Discretizer_Init(&d);
     int n, q;
     scanf("%d %d", &n, &q);
     for (int i = 0; i < n; ++i) {
         scanf("%d", &hb[i].h);
-        Discretizer_AddData(hb[i].h);
+        Discretizer_AddData(&d, hb[i].h);
     }
     for (int i = 0; i < n; ++i) {
         scanf("%d", &hb[i].b);
     }
     for (int i = 0; i < q; ++i) {
         scanf("%d", &k[i]);
-        Discretizer_AddData(k[i]);
+        Discretizer_AddData(&d, k[i]);
     }
-    Discretizer_Process();
+    Discretizer_Process(&d);
     for (int i = 0; i < n; ++i) {
-        hb[i].h = Discretizer_Get(hb[i].h);
+        hb[i].h = Discretizer_Get(&d, hb[i].h);
     }
     for (int i = 0; i < q; ++i) {
-        k[i] = Discretizer_Get(k[i]);
+        k[i] = Discretizer_Get(&d, k[i]);
     }
     qsort(hb, n, sizeof(HB), cmp_hb);
-    maxv[Discretizer_Size()] = -1;
+    maxv[d.size] = -1;
     int j = n - 1;
-    for (int i = Discretizer_Size() - 1; i >= 0; --i) {
+    for (int i = d.size - 1; i >= 0; --i) {
         maxv[i] = maxv[i + 1];
         while (j >= 0 && hb[j].h == i) {
             if (hb[j].b > maxv[i]) {

@@ -3,12 +3,13 @@
 #include <string.h>
 
 #define ALPHABET_SIZE 62
+#define type int
 
 typedef struct TrieNode {
     struct TrieNode* children[ALPHABET_SIZE];
     int isEndOfWord;
     int count;
-    int val;
+    type val;
 } TrieNode;
 
 TrieNode* TrieNode_Create() {
@@ -39,7 +40,7 @@ int trieIndex(char c) {
     return c - '0' + 52;
 }
 
-void Trie_Insert(TrieNode* root, const char* key, int val) {
+void Trie_Insert(TrieNode* root, const char* key, type val) {
     TrieNode* node = root;
     for (int i = 0; key[i] != '\0'; ++i) {
         int index = trieIndex(key[i]);
@@ -53,7 +54,7 @@ void Trie_Insert(TrieNode* root, const char* key, int val) {
     node->val = val;
 }
 
-int Trie_Search(TrieNode* root, const char* key, int* val) {
+int Trie_Search(TrieNode* root, const char* key, type* val) {
     TrieNode* node = root;
     for (int i = 0; key[i] != '\0'; ++i) {
         int index = trieIndex(key[i]);
