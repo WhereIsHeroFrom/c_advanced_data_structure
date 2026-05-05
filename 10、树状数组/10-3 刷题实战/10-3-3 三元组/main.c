@@ -3,100 +3,137 @@
 #include <string.h>
 
 #define mod 998244353
-#define maxn 200001
 
-int d_data[maxn];
-int d_size;
-int tree[maxn];
-int a[maxn];
-int lt[maxn];
+/////////////////////////////离散化模板/////////////////////////////
+// https://www.luogu.com.cn/problem/B3694
 
-int cmp_int(const void* a, const void* b) {
-    return *(int*)a - *(int*)b;
+// 2333 20 1.7 -5 20 1 20 -5
+// 第一步：排序  -5 -5 1 1.7 20 20 20 2333
+// 第二步：去重  -5 1 1.7 20 2333
+//               0  1 2   3  4
+#define type int
+#define maxn 200010
+
+typedef struct {
+    type data[maxn];
+    int size;
+} Discretizer;
+
+int cmp_type(const void* a, const void* b) {
+    type va = *(type*)a;
+    type vb = *(type*)b;
+    if (va < vb) return -1;
+    if (va > vb) return 1;
+    return 0;
 }
 
-void Discretizer_AddData(int v) {
-    d_data[d_size++] = v;
+void Discretizer_Init(Discretizer* d) {
+    d->size = 0;
 }
 
-void Discretizer_Process() {
-    qsort(d_data, d_size, sizeof(int), cmp_int);
+void Discretizer_AddData(Discretizer* d, type v) {
+    d->data[d->size++] = v;
+}
+
+void Discretizer_Process(Discretizer* d) {
+    qsort(d->data, d->size, sizeof(type), cmp_type);
     int lastIdx = 0;
-    for (int i = 1; i < d_size; ++i) {
-        int x = d_data[i];
-        if (x != d_data[lastIdx]) {
-            d_data[++lastIdx] = x;
+    for (int i = 1; i < d->size; ++i) {
+        type x = d->data[i];
+        if (x != d->data[lastIdx]) {
+            d->data[++lastIdx] = x;
         }
     }
-    d_size = lastIdx + 1;
+    d->size = lastIdx + 1;
 }
 
-int Discretizer_Get(int v) {
-    int l = -1, r = d_size;
+int Discretizer_Get(Discretizer* d, type v) {
+    int l = -1, r = d->size;
     while (l + 1 < r) {
         int mid = (l + r) >> 1;
-        if (d_data[mid] >= v) {
+        if (d->data[mid] >= v) {
             r = mid;
         } else {
             l = mid;
         }
     }
-    if (r == d_size || d_data[r] != v) {
+    if (r == d->size || d->data[r] != v) {
         return -1;
     }
     return r;
 }
+/////////////////////////////离散化模板/////////////////////////////
+
+////////////////////////树状数组模板(单点更新)////////////////////////
+
+typedef struct {
+    type tree[maxn];
+    int n;
+} FenwickTree;
 
 int lowbit(int x) {
     return x & (-x);
 }
 
-void FenwickTree_Update(int idx, int val, int n) {
-    while (idx <= n) {
-        tree[idx] += val;
+void FenwickTree_Init(FenwickTree* ft, int n) {
+    ft->n = n;
+    for (int i = 1; i <= n; ++i) {
+        ft->tree[i] = 0;
+    }
+}
+
+void FenwickTree_Update(FenwickTree* ft, int idx, type val) {
+    while (idx <= ft->n) {
+        ft->tree[idx] += val;
         idx += lowbit(idx);
     }
 }
 
-int FenwickTree_Query(int idx) {
-    int sum = 0;
+type FenwickTree_Query(FenwickTree* ft, int idx) {
+    type sum = 0;
     while (idx > 0) {
-        sum += tree[idx];
+        sum += ft->tree[idx];
         idx -= lowbit(idx);
     }
     return sum;
 }
 
-int FenwickTree_QueryRange(int l, int r) {
-    return FenwickTree_Query(r) - FenwickTree_Query(l - 1);
+type FenwickTree_QueryRange(FenwickTree* ft, int l, int r) {
+    return FenwickTree_Query(ft, r) - FenwickTree_Query(ft, l - 1);
 }
+////////////////////////树状数组模板(单点更新)////////////////////////
+Discretizer d;
+FenwickTree ft;
 
-void FenwickTree_Clear(int n) {
-    memset(tree, 0, sizeof(tree[0]) * (n + 1));
-}
+int a[maxn];
+int lt[maxn];
 
 int main() {
     int n;
     scanf("%d", &n);
-    d_size = 0;
+    
+    Discretizer_Init(&d);
     for (int i = 0; i < n; ++i) {
         scanf("%d", &a[i]);
-        Discretizer_AddData(a[i]);
+        Discretizer_AddData(&d, a[i]);
     }
-    Discretizer_Process();
+    Discretizer_Process(&d);
     for (int i = 0; i < n; ++i) {
-        a[i] = Discretizer_Get(a[i]) + 1;
+        a[i] = Discretizer_Get(&d, a[i]) + 1;
     }
-    FenwickTree_Clear(n);
+    FenwickTree_Init(&ft, n);
+    
     for (int i = 0; i < n; ++i) {
-        FenwickTree_Update(a[i], 1, n);
-        lt[i] = FenwickTree_Query(a[i] - 1);
+        FenwickTree_Update(&ft, a[i], 1);
+        lt[i] = FenwickTree_Query(&ft, a[i] - 1);
     }
-    FenwickTree_Clear(n);
+    
+    FenwickTree_Init(&ft, n);
+    
     long long sum = 0;
     for (int i = n - 1; i >= 0; --i) {
-        FenwickTree_Update(a[i], 1, n);
-        int gt = FenwickTree_QueryRange(a[i] + 1, n);
+        FenwickTree_Update(&ft, a[i], 1);
+        int gt = FenwickTree_QueryRange(&ft, a[i] + 1, n);
         sum += (long long)lt[i] * gt % mod;
         sum %= mod;
     }
