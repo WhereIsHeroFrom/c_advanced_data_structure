@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+/////////////////////////×ÖµäÊ÷Ä£°å(Ç°×ºÅÐ¶¨)/////////////////////////
+
 #define ALPHABET_SIZE 62
 #define type int
 
@@ -81,13 +83,15 @@ int Trie_QueryPrefixCount(TrieNode* root, const char* prefix) {
     }
     return node->count;
 }
+/////////////////////////×ÖµäÊ÷Ä£°å(Ç°×ºÅÐ¶¨)/////////////////////////
 
+char s[3000010];
 int main() {
     int t;
     scanf("%d", &t);
     while (t--) {
         int n, q;
-        char s[100];
+        
         scanf("%d %d", &n, &q);
         TrieNode* root = TrieNode_Create();
         for (int i = 0; i < n; ++i) {

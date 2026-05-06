@@ -2,13 +2,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+/////////////////////////×ÖµäÊ÷Ä£°å(Ç°×ºÅÐ¶¨)/////////////////////////
+
 #define ALPHABET_SIZE 26
+#define type int
 
 typedef struct TrieNode {
     struct TrieNode* children[ALPHABET_SIZE];
     int isEndOfWord;
     int count;
-    int val;
+    type val;
 } TrieNode;
 
 TrieNode* TrieNode_Create() {
@@ -34,7 +37,7 @@ int trieIndex(char c) {
     return c - 'a';
 }
 
-void Trie_Insert(TrieNode* root, const char* key, int val) {
+void Trie_Insert(TrieNode* root, const char* key, type val) {
     TrieNode* node = root;
     for (int i = 0; key[i] != '\0'; ++i) {
         int index = trieIndex(key[i]);
@@ -48,6 +51,22 @@ void Trie_Insert(TrieNode* root, const char* key, int val) {
     node->val = val;
 }
 
+int Trie_Search(TrieNode* root, const char* key, type* val) {
+    TrieNode* node = root;
+    for (int i = 0; key[i] != '\0'; ++i) {
+        int index = trieIndex(key[i]);
+        if (node->children[index] == NULL) {
+            return 0;
+        }
+        node = node->children[index];
+    }
+    if (node->isEndOfWord) {
+        *val = node->val;
+        return 1;
+    }
+    return 0;
+}
+
 int Trie_QueryPrefixCount(TrieNode* root, const char* prefix) {
     TrieNode* node = root;
     for (int i = 0; prefix[i] != '\0'; ++i) {
@@ -59,7 +78,7 @@ int Trie_QueryPrefixCount(TrieNode* root, const char* prefix) {
     }
     return node->count;
 }
-
+/////////////////////////×ÖµäÊ÷Ä£°å(Ç°×ºÅÐ¶¨)/////////////////////////
 char s[1000010];
 
 int main() {
