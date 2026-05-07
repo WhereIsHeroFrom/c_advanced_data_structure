@@ -1,39 +1,50 @@
 #include <stdio.h>
 #include <string.h>
 
-#define maxn 100010
+// P3367 【模板】并查集
+// https://www.luogu.com.cn/problem/P3367
 
-int far[maxn];
-int height[maxn];
+// 并：合并
+// 查：查找
+// 集：集合
 
-void UFSet_Init(int n) {
+#define maxn 200010
+
+typedef struct {
+    int far[maxn];
+    int height[maxn];
+    int n;
+} UFSet;
+
+void UFSet_Init(UFSet* uf, int n) {
+    uf->n = n;
     for (int i = 1; i <= n; ++i) {
-        far[i] = i;
-        height[i] = 1;
+        uf->far[i] = i;
+        uf->height[i] = 1;
     }
 }
 
-int UFSet_Find(int id) {
-    int p = far[id];
-    while (p != far[p]) {
-        p = far[p];
+int UFSet_Find(UFSet* uf, int id) {
+    int p = uf->far[id];
+    while (p != uf->far[p]) {
+        p = uf->far[p];
     }
     return p;
 }
 
-int UFSet_Union(int id1, int id2) {
-    int s1 = UFSet_Find(id1);
-    int s2 = UFSet_Find(id2);
+int UFSet_Union(UFSet* uf, int id1, int id2) {
+    int s1 = UFSet_Find(uf, id1);
+    int s2 = UFSet_Find(uf, id2);
     if (s1 == s2) {
         return 0;
     }
-    if (height[s1] < height[s2]) {
-        far[s1] = s2;
-    } else if (height[s2] < height[s1]) {
-        far[s2] = s1;
+    if (uf->height[s1] < uf->height[s2]) {
+        uf->far[s1] = s2;
+    } else if (uf->height[s2] < uf->height[s1]) {
+        uf->far[s2] = s1;
     } else {
-        far[s1] = s2;
-        height[s2]++;
+        uf->far[s1] = s2;
+        uf->height[s2]++;
     }
     return 1;
 }
@@ -41,14 +52,15 @@ int UFSet_Union(int id1, int id2) {
 int main() {
     int n, m;
     scanf("%d %d", &n, &m);
-    UFSet_Init(n);
+    UFSet uf;
+    UFSet_Init(&uf, n);
     while (m--) {
         int a, b, c;
         scanf("%d %d %d", &a, &b, &c);
         if (a == 1) {
-            UFSet_Union(b, c);
+            UFSet_Union(&uf, b, c);
         } else {
-            if (UFSet_Find(b) == UFSet_Find(c)) {
+            if (UFSet_Find(&uf, b) == UFSet_Find(&uf, c)) {
                 printf("Y\n");
             } else {
                 printf("N\n");

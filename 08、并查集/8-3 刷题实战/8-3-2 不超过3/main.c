@@ -1,42 +1,55 @@
 #include <stdio.h>
 #include <string.h>
 
-#define maxn 100010
+//////////////////////并查集模板(路径压缩)//////////////////////
 
-int far[maxn];
+// 并：合并
+// 查：查找
+// 集：集合
 
-void UFSet_Init(int n) {
+#define maxn 200010
+
+typedef struct {
+    int far[maxn];
+    int n;
+} UFSet;
+
+void UFSet_Init(UFSet* uf, int n) {
+    uf->n = n;
     for (int i = 1; i <= n; ++i) {
-        far[i] = i;
+        uf->far[i] = i;
     }
 }
 
-int UFSet_Find(int id) {
-    if (far[id] == id) {
+int UFSet_Find(UFSet* uf, int id) {
+    if (uf->far[id] == id) {
         return id;
     }
-    return far[id] = UFSet_Find(far[id]);
+    return uf->far[id] = UFSet_Find(uf, uf->far[id]);
 }
 
-int UFSet_Union(int id1, int id2) {
-    int s1 = UFSet_Find(id1);
-    int s2 = UFSet_Find(id2);
+int UFSet_Union(UFSet* uf, int id1, int id2) {
+    int s1 = UFSet_Find(uf, id1);
+    int s2 = UFSet_Find(uf, id2);
     if (s1 == s2) {
         return 0;
     }
-    far[s1] = s2;
+    uf->far[s1] = s2;
     return 1;
 }
+//////////////////////并查集模板(路径压缩)//////////////////////
+
 
 int main() {
     int n, m;
     scanf("%d %d", &n, &m);
     int count = n;
-    UFSet_Init(n);
+    UFSet uf;
+    UFSet_Init(&uf, n);
     while (m--) {
         int a, b;
         scanf("%d %d", &a, &b);
-        if (UFSet_Union(a, b)) {
+        if (UFSet_Union(&uf, a, b)) {
             count--;
         }
     }

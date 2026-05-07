@@ -1,29 +1,40 @@
 #include <stdio.h>
 #include <string.h>
 
-#define maxn 100010
+// P3367 【模板】并查集
+// https://www.luogu.com.cn/problem/P3367
 
-int set[maxn];
+// 并：合并
+// 查：查找
+// 集：集合
 
-void UFSet_Init(int n) {
+#define maxn 200010
+
+typedef struct {
+    int set[maxn];
+    int n;
+} UFSet;
+
+void UFSet_Init(UFSet* uf, int n) {
+    uf->n = n;
     for (int i = 1; i <= n; ++i) {
-        set[i] = i;
+        uf->set[i] = i;
     }
 }
 
-int UFSet_Find(int id) {
-    return set[id];
+int UFSet_Find(UFSet* uf, int id) {
+    return uf->set[id];
 }
 
-int UFSet_Union(int id1, int id2, int n) {
-    int s1 = UFSet_Find(id1);
-    int s2 = UFSet_Find(id2);
+int UFSet_Union(UFSet* uf, int id1, int id2) {
+    int s1 = UFSet_Find(uf, id1);
+    int s2 = UFSet_Find(uf, id2);
     if (s1 == s2) {
         return 0;
     }
-    for (int i = 1; i <= n; ++i) {
-        if (set[i] == s1) {
-            set[i] = s2;
+    for (int i = 1; i <= uf->n; ++i) {
+        if (uf->set[i] == s1) {
+            uf->set[i] = s2;
         }
     }
     return 1;
@@ -32,14 +43,15 @@ int UFSet_Union(int id1, int id2, int n) {
 int main() {
     int n, m;
     scanf("%d %d", &n, &m);
-    UFSet_Init(n);
+    UFSet uf;
+    UFSet_Init(&uf, n);
     while (m--) {
         int a, b, c;
         scanf("%d %d %d", &a, &b, &c);
         if (a == 1) {
-            UFSet_Union(b, c, n);
+            UFSet_Union(&uf, b, c);
         } else {
-            if (UFSet_Find(b) == UFSet_Find(c)) {
+            if (UFSet_Find(&uf, b) == UFSet_Find(&uf, c)) {
                 printf("Y\n");
             } else {
                 printf("N\n");
