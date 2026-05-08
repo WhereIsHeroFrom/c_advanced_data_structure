@@ -5,59 +5,62 @@
 #define Capacity 100
 
 typedef struct {
-    int m_data[Capacity];
-    int m_size;
-} BigInt;
+    int data[Capacity];
+    int size;
+}BigInt;
 
-void BigInt_Init(BigInt* bi) {
-    bi->m_size = 0;
-    memset(bi->m_data, 0, sizeof(bi->m_data));
+void BigInit_Init(BigInt* bi) {
+    bi->size = 0;
+    memset(bi->data, 0, sizeof(bi->data));
 }
 
-void BigInt_Copy(BigInt* dest, const BigInt* src) {
-    dest->m_size = src->m_size;
-    memcpy(dest->m_data, src->m_data, sizeof(src->m_data));
+void BigInit_Copy(BigInt* dest, const BigInt* src) {
+    dest->size = src->size;
+    memcpy(dest->data, src->data, sizeof(src->data));
 }
 
 void BigInt_FromString(BigInt* bi, const char s[]) {
-    int b = 1;
-    bi->m_size = 0;
-    bi->m_data[bi->m_size] = 0;
-    for (int i = strlen(s) - 1; i >= 0; --i) {
-        bi->m_data[bi->m_size] += (s[i] - '0') * b;
-        b *= 10;
-        if (b >= Base) {
-            b = 1;
-            bi->m_size++;
-            bi->m_data[bi->m_size] = 0;
-        }
+    int b = 1;  // 1 10 100 1000 1 10 100 1000
+    bi->size = 0;
+    bi->data[ bi->size ] = 0;
+    // 012 345 678
+    //  2   1   0
+    // size = 3
+    for(int i = strlen(s)-1; i >= 0; --i) {
+       bi->data[bi->size] +=  (s[i]-'0') * b;
+       b *= 10;
+       if(b >= Base) {
+           b = 1;
+           bi->size++;
+           bi->data[bi->size] = 0;
+       }
     }
-    if (bi->m_data[bi->m_size] > 0) {
-        bi->m_size++;
+    if(bi->data[bi->size] > 0) {
+        bi->size++;
     }
 }
 
 void BigInt_Print(const BigInt* bi, char end) {
-    if (bi->m_size == 0) {
+    if(bi->size == 0) {
         printf("0");
-    } else {
-        printf("%d", bi->m_data[bi->m_size - 1]);
-        for (int i = bi->m_size - 2; i >= 0; --i) {
-            for (int j = Base / 10; j > 0; j /= 10) {
-                printf("%d", (bi->m_data[i] / j) % 10);
+    }else {
+        printf("%d", bi->data[bi->size-1]);
+        for(int i = bi->size-2; i >= 0; --i) {
+            for(int j = Base/10; j > 0; j /= 10) {
+                // 100 10 1
+                printf("%d", bi->data[i]/j % 10);
             }
         }
     }
     printf("%c", end);
 }
 
+char s[10010];
+BigInt b;
 int main() {
-    char s[1000];
-    while (scanf("%s", s) != EOF) {
-        BigInt b;
-        BigInt_Init(&b);
-        BigInt_FromString(&b, s);
-        BigInt_Print(&b, '\n');
-    }
+    scanf("%s", s);
+    BigInit_Init(&b);
+    BigInt_FromString(&b, s);
+    BigInt_Print(&b, '\n');
     return 0;
 }
