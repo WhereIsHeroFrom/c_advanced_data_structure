@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+////////////////////////C链式前向星模板////////////////////////
+
 #define maxn 100010
+#define maxm 200010
 
 typedef struct {
     int to;
@@ -10,43 +13,50 @@ typedef struct {
     int next;
 } Edge;
 
-Edge edges[maxn];
-int head[maxn];
-int edge_count;
+typedef struct {
+    Edge edges[maxm];
+    int head[maxn];
+    int edge_count;
+    int n;
+} Graph;
 
-void Graph_Init(int n) {
-    edge_count = 0;
-    memset(head, -1, sizeof(head[0]) * n);
+void Graph_Init(Graph* g, int n) {
+    g->n = n;
+    g->edge_count = 0;
+    memset(g->head, -1, sizeof(g->head[0]) * n);
 }
 
-void Graph_AddEdge(int from, int to, int weight) {
-    edges[edge_count].to = to;
-    edges[edge_count].weight = weight;
-    edges[edge_count].next = head[from];
-    head[from] = edge_count++;
+void Graph_AddEdge(Graph* g, int from, int to, int weight) {
+    g->edges[g->edge_count].to = to;
+    g->edges[g->edge_count].weight = weight;
+    g->edges[g->edge_count].next = g->head[from];
+    g->head[from] = g->edge_count++;
 }
 
-void Graph_PrintEdges(int n) {
-    for (int i = 0; i < n; ++i) {
+void Graph_PrintEdges(Graph* g) {
+    for (int i = 0; i < g->n; ++i) {
         printf("%d:", i);
-        for (int e = head[i]; e != -1; e = edges[e].next) {
-            int v = edges[e].to;
-            int w = edges[e].weight;
+        for (int e = g->head[i]; e != -1; e = g->edges[e].next) {
+            int v = g->edges[e].to;
+            int w = g->edges[e].weight;
             printf("(%d,%d)", v, w);
         }
         printf("\n");
     }
 }
 
+////////////////////////C链式前向星模板////////////////////////
+
 int main() {
     int n, m;
     scanf("%d %d", &n, &m);
-    Graph_Init(n);
+    Graph g;
+    Graph_Init(&g, n);
     while (m--) {
         int a, b, c;
         scanf("%d %d %d", &a, &b, &c);
-        Graph_AddEdge(a, b, c);
+        Graph_AddEdge(&g, a, b, c);
     }
-    Graph_PrintEdges(n);
+    Graph_PrintEdges(&g);
     return 0;
 }
